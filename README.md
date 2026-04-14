@@ -1,6 +1,6 @@
 # Dataset Lens for VS Code
 
-![Version](https://img.shields.io/badge/version-2.2.0-blue)
+![Version](https://img.shields.io/badge/version-2.3.1-blue)
 ![VS Code](https://img.shields.io/badge/VS%20Code-^1.74.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -163,7 +163,17 @@ This extension contributes the following commands:
 
 ## 📝 Release Notes
 
-### 2.2.0 (Current)
+### 2.3.1 (Current)
+
+- **Auto-managed Python Virtual Environment**: No more manual `pip install` required
+  - Extension automatically creates an isolated venv on first use
+  - Installs pandas, pyreadstat, pyreadr, and numpy automatically
+  - Works in corporate environments where global pip install is restricted
+  - Venv is stored in VS Code's global storage (user-space, no admin needed)
+  - Shows a one-time progress notification during setup
+  - Validates existing venv on subsequent uses — skips setup if packages are already present
+
+### 2.2.0
 
 - **Major XPT Performance Improvements**:
   - Smart header-based version detection (v5/v6 vs v8/v9)
