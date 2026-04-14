@@ -1,0 +1,41 @@
+# Compiled output
+out/
+dist/
+
+# Node modules
+node_modules/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# VS Code specific
+.vscode/settings.json
+.vscode/launch.json
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Package files
+*.vsix
+
+# Test data files (keep some for testing)
+*.sas7bdat
+!test_data/
+test_data/*.sas7bdat
+
+# Claude context
+.claude/.env
+
+# Environment and local settings
+.env
+settings.local.json

@@ -1,0 +1,31 @@
+{
+  "datasetJSONCreationDateTime": "2024-01-15T10:30:00",
+  "datasetJSONVersion": "1.1.0",
+  "clinicalData": {
+    "studyOID": "STUDY001",
+    "metaDataVersionOID": "MDV.1.0",
+    "itemGroupData": {
+      "DM": {
+        "records": 5,
+        "name": "DM",
+        "label": "Demographics",
+        "items": [
+          {"OID": "IT.DM.STUDYID", "name": "STUDYID", "label": "Study Identifier", "type": "string", "length": 12},
+          {"OID": "IT.DM.USUBJID", "name": "USUBJID", "label": "Unique Subject Identifier", "type": "string", "length": 20},
+          {"OID": "IT.DM.SUBJID", "name": "SUBJID", "label": "Subject Identifier", "type": "string", "length": 8},
+          {"OID": "IT.DM.AGE", "name": "AGE", "label": "Age", "type": "integer", "length": 8},
+          {"OID": "IT.DM.SEX", "name": "SEX", "label": "Sex", "type": "string", "length": 1},
+          {"OID": "IT.DM.RACE", "name": "RACE", "label": "Race", "type": "string", "length": 40},
+          {"OID": "IT.DM.COUNTRY", "name": "COUNTRY", "label": "Country", "type": "string", "length": 3}
+        ],
+        "itemData": [
+          ["STUDY001", "STUDY001-001", "001", 45, "M", "WHITE", "USA"],
+          ["STUDY001", "STUDY001-002", "002", 32, "F", "ASIAN", "JPN"],
+          ["STUDY001", "STUDY001-003", "003", 58, "M", "BLACK OR AFRICAN AMERICAN", "USA"],
+          ["STUDY001", "STUDY001-004", "004", 27, "F", "WHITE", "GBR"],
+          ["STUDY001", "STUDY001-005", "005", 51, "M", "ASIAN", "CHN"]
+        ]
+      }
+    }
+  }
+}

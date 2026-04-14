@@ -1,0 +1,4 @@
+This is the first file for comparison.
+It contains some text.
+There is something difffernt here.
+This line is unique to file2.

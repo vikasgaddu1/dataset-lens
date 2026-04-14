@@ -1,0 +1,157 @@
+{
+  "name": "dataset-lens",
+  "displayName": "Dataset Lens",
+  "description": "View, filter, and analyze SAS7BDAT, XPT (XPORT), CDISC Dataset-JSON, and R data files (.rds, .rdata) directly in VS Code with powerful features like WHERE clause filtering, variable selection, and pagination",
+  "version": "2.3.0",
+  "publisher": "elearnsas",
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#1e3a5f",
+    "theme": "dark"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vikasgaddu1/dataset-lens"
+  },
+  "homepage": "https://github.com/vikasgaddu1/dataset-lens#readme",
+  "bugs": {
+    "url": "https://github.com/vikasgaddu1/dataset-lens/issues"
+  },
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Data Science",
+    "Visualization",
+    "Other"
+  ],
+  "keywords": [
+    "sas",
+    "sas7bdat",
+    "xpt",
+    "xport",
+    "rds",
+    "rdata",
+    "r",
+    "cdisc",
+    "dataset-json",
+    "dataset",
+    "data viewer",
+    "statistics"
+  ],
+  "activationEvents": [
+    "onCustomEditor:sasDataExplorer.sas7bdat",
+    "onCustomEditor:sasDataExplorer.xpt",
+    "onCustomEditor:sasDataExplorer.rds",
+    "onCustomEditor:sasDataExplorer.rdata",
+    "onCustomEditor:sasDataExplorer.datasetjson"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "sasDataExplorer.sas7bdat",
+        "displayName": "Dataset Lens",
+        "selector": [
+          {
+            "filenamePattern": "*.sas7bdat"
+          }
+        ]
+      },
+      {
+        "viewType": "sasDataExplorer.xpt",
+        "displayName": "Dataset Lens - XPT",
+        "selector": [
+          {
+            "filenamePattern": "*.xpt"
+          }
+        ]
+      },
+      {
+        "viewType": "sasDataExplorer.rds",
+        "displayName": "Dataset Lens - RDS",
+        "selector": [
+          {
+            "filenamePattern": "*.rds"
+          }
+        ]
+      },
+      {
+        "viewType": "sasDataExplorer.rdata",
+        "displayName": "Dataset Lens - RData",
+        "selector": [
+          {
+            "filenamePattern": "*.rdata"
+          },
+          {
+            "filenamePattern": "*.rda"
+          }
+        ]
+      },
+      {
+        "viewType": "sasDataExplorer.datasetjson",
+        "displayName": "Dataset Lens - Dataset-JSON",
+        "selector": [
+          {
+            "filenamePattern": "*.json"
+          }
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "sasDataExplorer.openDataset",
+        "title": "Open SAS Dataset",
+        "category": "Dataset Lens"
+      },
+      {
+        "command": "sasDataExplorer.openXPT",
+        "title": "Open SAS XPT File",
+        "category": "Dataset Lens"
+      },
+      {
+        "command": "sasDataExplorer.openRData",
+        "title": "Open R Data File",
+        "category": "Dataset Lens"
+      },
+      {
+        "command": "sasDataExplorer.openDatasetJson",
+        "title": "Open CDISC Dataset-JSON File",
+        "category": "Dataset Lens"
+      },
+      {
+        "command": "sasDataExplorer.showOutput",
+        "title": "Show Output",
+        "category": "Dataset Lens"
+      }
+    ],
+    "configuration": {
+      "title": "Dataset Lens",
+      "properties": {
+        "sasDataExplorer.enableDebugLogging": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable debug logging for the Dataset Lens extension"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "18.x",
+    "@types/vscode": "^1.74.0",
+    "@vscode/vsce": "^3.6.2",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "js-stream-sas7bdat": "^0.1.5",
+    "xport-js": "^0.3.2"
+  }
+}

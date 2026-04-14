@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth:*)",
+      "Bash(gh repo:*)",
+      "Read(//c/c/python/**)",
+      "Read(//c/python/dataset lens extension/SAS_EXT/**)",
+      "Bash(grep -r \"python\" src/*.ts src/**/*.ts)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}
