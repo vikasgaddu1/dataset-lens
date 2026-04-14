@@ -56,6 +56,25 @@ export class PythonEnvironment {
         return spawn(this.getPythonPath(), args, { cwd });
     }
 
+    /**
+     * Delete the venv and recreate it from scratch.
+     */
+    async reset(context: vscode.ExtensionContext): Promise<void> {
+        this.ready = false;
+        this.initializing = null;
+
+        if (this.venvPath) {
+            try {
+                await fs.promises.rm(this.venvPath, { recursive: true, force: true });
+                Logger.info(`Deleted Python venv at ${this.venvPath}`);
+            } catch (err) {
+                Logger.error('Failed to delete venv', err);
+            }
+        }
+
+        await this._initialize(context);
+    }
+
     private async _initialize(context: vscode.ExtensionContext): Promise<void> {
         const globalStoragePath = context.globalStorageUri.fsPath;
         this.venvPath = path.join(globalStoragePath, 'python-env');
@@ -164,7 +183,11 @@ export class PythonEnvironment {
      */
     private _runCommand(command: string, args: string[]): Promise<string> {
         return new Promise((resolve, reject) => {
-            const proc = spawn(command, args, { shell: true });
+            // Only use the shell for bare command names (PATH lookup, e.g. "py", "python").
+            // Absolute paths must NOT go through the shell, because shell:true on Windows
+            // concatenates args without quoting, which breaks paths containing spaces.
+            const useShell = !path.isAbsolute(command);
+            const proc = spawn(command, args, { shell: useShell });
             let stdout = '';
             let stderr = '';
 

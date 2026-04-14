@@ -5,6 +5,7 @@ import { RDatasetProvider } from './RDataProvider';
 import { DatasetJsonProvider } from './DatasetJsonProvider';
 import { SASWebviewPanel } from './WebviewPanel';
 import { Logger } from './utils/logger';
+import { PythonEnvironment } from './utils/pythonEnvironment';
 
 /**
  * Activates the Dataset Lens extension
@@ -169,6 +170,26 @@ export function activate(context: vscode.ExtensionContext) {
         }
     );
 
+    // Register command to reset Python environment
+    const resetPythonEnvCommand = vscode.commands.registerCommand(
+        'sasDataExplorer.resetPythonEnv',
+        async () => {
+            const choice = await vscode.window.showWarningMessage(
+                'This will delete and recreate the Python virtual environment. Continue?',
+                'Yes', 'No'
+            );
+            if (choice === 'Yes') {
+                try {
+                    const pyEnv = PythonEnvironment.getInstance();
+                    await pyEnv.reset(context);
+                    vscode.window.showInformationMessage('Dataset Lens: Python environment has been recreated.');
+                } catch (err) {
+                    vscode.window.showErrorMessage(`Failed to reset Python environment: ${err}`);
+                }
+            }
+        }
+    );
+
     // Add disposables to context for proper cleanup
     context.subscriptions.push(
         sasDisposable,
@@ -180,7 +201,8 @@ export function activate(context: vscode.ExtensionContext) {
         openXPTCommand,
         openRDataCommand,
         openDatasetJsonCommand,
-        showOutputCommand
+        showOutputCommand,
+        resetPythonEnvCommand
     );
 
     // Ensure logger is disposed when extension deactivates
