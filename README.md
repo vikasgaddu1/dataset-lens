@@ -163,7 +163,25 @@ This extension contributes the following commands:
 
 ## 📝 Release Notes
 
-### 2.3.1 (Current)
+### 2.4.0 (Current)
+
+- **Filter-aware Unique Values**: The Unique modal now respects the active WHERE filter by default
+  - Results include scope info ("Scope: filtered N of M rows") at the top of the modal
+  - Toggle "Apply current WHERE filter" to switch between filtered and unfiltered results without re-running the query manually
+  - Implemented for SAS7BDAT, XPT, and Dataset-JSON formats; R data falls back to unfiltered with a debug log
+- **Collapsible Variables Sidebar**: New "☰ Hide Variables" toggle in the toolbar reclaims horizontal space for wide tables
+  - Sidebar state is persisted per webview via `vscode.setState`
+  - Auto-collapses on narrow viewports (<700px) for first-time use
+- **Responsive Layout**: Improved behavior at narrow widths
+  - Filter section stacks vertically below 900px so controls remain reachable
+  - Pagination controls wrap cleanly instead of overflowing
+  - Sidebar overlays the content area below 700px with a subtle shadow
+
+### 2.3.3
+
+- **Fix**: Python venv reset when extension installation path contains spaces
+
+### 2.3.1
 
 - **Auto-managed Python Virtual Environment**: No more manual `pip install` required
   - Extension automatically creates an isolated venv on first use

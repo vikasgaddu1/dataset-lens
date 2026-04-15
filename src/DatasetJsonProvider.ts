@@ -247,15 +247,19 @@ export class DatasetJsonDocument implements IDatasetDocument {
     /**
      * Gets unique values for a column
      */
-    public async getUniqueValues(columnName: string, includeCount: boolean = false): Promise<any[]> {
+    public async getUniqueValues(columnName: string, includeCount: boolean = false, whereClause?: string): Promise<any[]> {
         if (!this.parsedData) return [];
 
         const allColumns = this.parsedData.columns.map(c => c.name);
         const colIdx = allColumns.findIndex(c => c.toLowerCase() === columnName.toLowerCase());
         if (colIdx < 0) return [];
 
+        const sourceRows = whereClause && whereClause.trim() !== ''
+            ? this.applyWhereClause(this.parsedData.rows, allColumns, whereClause)
+            : this.parsedData.rows;
+
         const counts = new Map<any, number>();
-        for (const row of this.parsedData.rows) {
+        for (const row of sourceRows) {
             const val = row[colIdx];
             counts.set(val, (counts.get(val) || 0) + 1);
         }
@@ -270,7 +274,7 @@ export class DatasetJsonDocument implements IDatasetDocument {
     /**
      * Gets unique combinations for multiple columns
      */
-    public async getUniqueCombinations(columnNames: string[], includeCount: boolean = false): Promise<any[]> {
+    public async getUniqueCombinations(columnNames: string[], includeCount: boolean = false, whereClause?: string): Promise<any[]> {
         if (!this.parsedData) return [];
 
         const allColumns = this.parsedData.columns.map(c => c.name);
@@ -280,9 +284,13 @@ export class DatasetJsonDocument implements IDatasetDocument {
 
         if (colIndices.length === 0) return [];
 
+        const sourceRows = whereClause && whereClause.trim() !== ''
+            ? this.applyWhereClause(this.parsedData.rows, allColumns, whereClause)
+            : this.parsedData.rows;
+
         const counts = new Map<string, { values: Record<string, any>; count: number }>();
 
-        for (const row of this.parsedData.rows) {
+        for (const row of sourceRows) {
             const values: Record<string, any> = {};
             for (const idx of colIndices) {
                 values[allColumns[idx]] = row[idx];

@@ -194,7 +194,10 @@ export class RDatasetDocument implements IDatasetDocument {
     /**
      * Gets unique values for a column
      */
-    public async getUniqueValues(columnName: string, includeCount: boolean = false): Promise<any[]> {
+    public async getUniqueValues(columnName: string, includeCount: boolean = false, whereClause?: string): Promise<any[]> {
+        if (whereClause && whereClause.trim() !== '') {
+            this.logger.debug('R reader does not yet support filter-aware unique values; returning unfiltered results');
+        }
         try {
             const result = await this.executePythonCommand(
                 'unique',
@@ -216,7 +219,7 @@ export class RDatasetDocument implements IDatasetDocument {
      * Gets unique combinations for multiple columns
      * Note: Not fully implemented in Python reader yet - returns empty array
      */
-    public async getUniqueCombinations(columnNames: string[], includeCount: boolean = false): Promise<any[]> {
+    public async getUniqueCombinations(columnNames: string[], includeCount: boolean = false, whereClause?: string): Promise<any[]> {
         // Would need to implement this in r_reader.py if needed
         this.logger.debug('getUniqueCombinations called but not implemented for R data files');
         return [];

@@ -254,9 +254,9 @@ export class SASDatasetDocument implements IDatasetDocument {
     /**
      * Gets unique values for a column (new feature)
      */
-    public async getUniqueValues(columnName: string, includeCount: boolean = false): Promise<any[]> {
+    public async getUniqueValues(columnName: string, includeCount: boolean = false, whereClause?: string): Promise<any[]> {
         if (!this.usePythonFallback && this.reader) {
-            return await this.reader.getUniqueValues(columnName, includeCount);
+            return await this.reader.getUniqueValues(columnName, includeCount, whereClause);
         }
 
         // Python fallback - implement manually
@@ -264,7 +264,8 @@ export class SASDatasetDocument implements IDatasetDocument {
             filePath: this.uri.fsPath,
             startRow: 0,
             numRows: this.metadata?.total_rows || 10000,
-            selectedVars: [columnName]
+            selectedVars: [columnName],
+            whereClause: whereClause || ''
         });
 
         const uniqueMap = new Map<any, number>();
@@ -283,9 +284,9 @@ export class SASDatasetDocument implements IDatasetDocument {
     /**
      * Gets unique combinations for multiple columns (new feature)
      */
-    public async getUniqueCombinations(columnNames: string[], includeCount: boolean = false): Promise<any[]> {
+    public async getUniqueCombinations(columnNames: string[], includeCount: boolean = false, whereClause?: string): Promise<any[]> {
         if (!this.usePythonFallback && this.reader) {
-            return await this.reader.getUniqueCombinations(columnNames, includeCount);
+            return await this.reader.getUniqueCombinations(columnNames, includeCount, whereClause);
         }
 
         // Python fallback - implement manually
@@ -293,7 +294,8 @@ export class SASDatasetDocument implements IDatasetDocument {
             filePath: this.uri.fsPath,
             startRow: 0,
             numRows: this.metadata?.total_rows || 10000,
-            selectedVars: columnNames
+            selectedVars: columnNames,
+            whereClause: whereClause || ''
         });
 
         const uniqueMap = new Map<string, any>();

@@ -246,9 +246,9 @@ export class XPTDatasetDocument implements IDatasetDocument {
     /**
      * Gets unique values for a column
      */
-    public async getUniqueValues(columnName: string, includeCount: boolean = false): Promise<any[]> {
+    public async getUniqueValues(columnName: string, includeCount: boolean = false, whereClause?: string): Promise<any[]> {
         if (this.reader) {
-            return await this.reader.getUniqueValues(columnName, includeCount);
+            return await this.reader.getUniqueValues(columnName, includeCount, whereClause);
         }
 
         return [];
@@ -257,9 +257,9 @@ export class XPTDatasetDocument implements IDatasetDocument {
     /**
      * Gets unique combinations for multiple columns
      */
-    public async getUniqueCombinations(columnNames: string[], includeCount: boolean = false): Promise<any[]> {
+    public async getUniqueCombinations(columnNames: string[], includeCount: boolean = false, whereClause?: string): Promise<any[]> {
         if (this.reader) {
-            return await this.reader.getUniqueCombinations(columnNames, includeCount);
+            return await this.reader.getUniqueCombinations(columnNames, includeCount, whereClause);
         }
 
         return [];

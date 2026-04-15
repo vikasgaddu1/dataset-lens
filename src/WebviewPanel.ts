@@ -323,10 +323,12 @@ export class SASWebviewPanel {
     /**
      * Handle get unique values request
      */
-    private async handleGetUniqueValues(data: { variables: string[] }): Promise<void> {
+    private async handleGetUniqueValues(data: { variables: string[], whereClause?: string, useFilter?: boolean }): Promise<void> {
         const { variables } = data;
+        const useFilter = data.useFilter !== false; // default true
+        const effectiveWhere = useFilter ? (data.whereClause || this.filterState.whereClause || '') : '';
 
-        this.logger.debug('Getting unique values for variables:', variables);
+        this.logger.debug(`Getting unique values for [${variables.join(', ')}] whereClause: ${effectiveWhere || '(none)'}`);
 
         // Validate that requested variables exist in metadata
         if (this.document.metadata) {
@@ -347,12 +349,12 @@ export class SASWebviewPanel {
 
             if (variables.length === 1) {
                 // Single variable - get unique values
-                result = await this.document.getUniqueValues(variables[0], true);
+                result = await this.document.getUniqueValues(variables[0], true, effectiveWhere);
                 // Format for frontend - result is already in the correct format
                 formattedValues = result;
             } else {
                 // Multiple variables - get unique combinations
-                result = await this.document.getUniqueCombinations(variables, true);
+                result = await this.document.getUniqueCombinations(variables, true, effectiveWhere);
                 // Format for frontend - convert from column-based objects to expected format
                 formattedValues = result.map((row: any) => {
                     const combination: any = {};
@@ -366,11 +368,26 @@ export class SASWebviewPanel {
                 });
             }
 
+            // Resolve scoped row count for the modal header
+            let scopedRowCount: number | undefined;
+            if (effectiveWhere) {
+                try {
+                    scopedRowCount = await this.document.getFilteredRowCount(effectiveWhere);
+                } catch {
+                    scopedRowCount = undefined;
+                }
+            } else {
+                scopedRowCount = this.document.metadata?.total_rows;
+            }
+
             // Format response for webview
             const response = {
                 variables: variables,
                 values: formattedValues,
-                totalUnique: formattedValues.length
+                totalUnique: formattedValues.length,
+                appliedWhereClause: effectiveWhere,
+                scopedRowCount: scopedRowCount,
+                totalRows: this.document.metadata?.total_rows
             };
 
             await this.panel.webview.postMessage({

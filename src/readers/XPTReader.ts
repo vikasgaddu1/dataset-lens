@@ -510,8 +510,11 @@ export class XPTReader {
     /**
      * Get unique values for a column
      */
-    async getUniqueValues(columnName: string, includeCount: boolean = false): Promise<any[]> {
-        const records = await this.readAllRecords();
+    async getUniqueValues(columnName: string, includeCount: boolean = false, whereClause?: string): Promise<any[]> {
+        const allRecords = await this.readAllRecords();
+        const records = whereClause && whereClause.trim() !== ''
+            ? this.applyFilter(allRecords, whereClause)
+            : allRecords;
         if (records.length === 0) {
             return [];
         }
@@ -543,8 +546,11 @@ export class XPTReader {
     /**
      * Get unique combinations for multiple columns
      */
-    async getUniqueCombinations(columnNames: string[], includeCount: boolean = false): Promise<any[]> {
-        const records = await this.readAllRecords();
+    async getUniqueCombinations(columnNames: string[], includeCount: boolean = false, whereClause?: string): Promise<any[]> {
+        const allRecords = await this.readAllRecords();
+        const records = whereClause && whereClause.trim() !== ''
+            ? this.applyFilter(allRecords, whereClause)
+            : allRecords;
         if (records.length === 0) {
             return [];
         }

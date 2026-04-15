@@ -69,6 +69,6 @@ export interface IDatasetDocument extends vscode.CustomDocument {
     metadata: SASMetadata | null;
     getData(request: SASDataRequest): Promise<SASDataResponse>;
     getFilteredRowCount(whereClause: string): Promise<number>;
-    getUniqueValues(columnName: string, includeCount?: boolean): Promise<any[]>;
-    getUniqueCombinations(columnNames: string[], includeCount?: boolean): Promise<any[]>;
+    getUniqueValues(columnName: string, includeCount?: boolean, whereClause?: string): Promise<any[]>;
+    getUniqueCombinations(columnNames: string[], includeCount?: boolean, whereClause?: string): Promise<any[]>;
 }

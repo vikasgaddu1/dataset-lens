@@ -2,6 +2,18 @@
 
 All notable changes to the "SAS Data Explorer" extension will be documented in this file.
 
+## [2.4.0] - 2026-04-15
+
+### Added
+- Filter-aware Unique Values modal — respects the active WHERE filter by default, with a per-modal toggle to switch between filtered and unfiltered results, and a scope summary ("filtered N of M rows") at the top.
+- Collapsible Variables sidebar with persisted state per webview, auto-collapsed on narrow viewports.
+
+### Improved
+- Responsive layout for narrow widths: filter controls stack below 900px, pagination controls wrap cleanly, and the sidebar overlays content below 700px.
+
+### Internal
+- Threaded an optional `whereClause` parameter through `IDatasetDocument.getUniqueValues` / `getUniqueCombinations` and the SAS, XPT, and Dataset-JSON readers. R reader falls back to unfiltered with a debug log.
+
 ## [2.0.1] - 2025-01-28
 
 ### 🎨 UI Redesign & Improvements

@@ -198,7 +198,8 @@ export class EnhancedSASReader {
      */
     async getUniqueValues(
         columnName: string,
-        includeCount: boolean = false
+        includeCount: boolean = false,
+        whereClause?: string
     ): Promise<any[] | UniqueValueResult[]> {
 
         if (!this.metadata) {
@@ -214,8 +215,13 @@ export class EnhancedSASReader {
             throw new Error(`Column '${columnName}' not found`);
         }
 
-        // Get data
-        const data = await this.getRawData();
+        // Get data, optionally restricted to rows matching the WHERE clause
+        const allRows = await this.getRawData();
+        let data = allRows;
+        if (whereClause && whereClause.trim() !== '') {
+            const indices = await this.getFilteredIndices(whereClause);
+            data = indices.map(i => allRows[i]);
+        }
 
         if (includeCount) {
             // Count occurrences
@@ -242,7 +248,8 @@ export class EnhancedSASReader {
      */
     async getUniqueCombinations(
         columnNames: string[],
-        includeCount: boolean = false
+        includeCount: boolean = false,
+        whereClause?: string
     ): Promise<any[][]> {
 
         if (!this.metadata) {
@@ -260,8 +267,13 @@ export class EnhancedSASReader {
             return idx;
         });
 
-        // Get data
-        const data = await this.getRawData();
+        // Get data, optionally restricted to rows matching the WHERE clause
+        const allRows = await this.getRawData();
+        let data = allRows;
+        if (whereClause && whereClause.trim() !== '') {
+            const filteredIdx = await this.getFilteredIndices(whereClause);
+            data = filteredIdx.map(i => allRows[i]);
+        }
 
         if (includeCount) {
             // Count occurrences of combinations

@@ -503,6 +503,78 @@ export function getPaginationHTML(metadata: any): string {
                 color: var(--vscode-descriptionForeground);
                 width: 150px;
             }
+
+            /* Sidebar toggle + responsive layout */
+            .topbar {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+
+            .sidebar-toggle {
+                padding: 5px 10px;
+                background: var(--vscode-button-secondaryBackground, var(--vscode-button-background));
+                color: var(--vscode-button-secondaryForeground, var(--vscode-button-foreground));
+                border: 1px solid var(--vscode-panel-border);
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 12px;
+                line-height: 1.2;
+                white-space: nowrap;
+            }
+
+            .sidebar-toggle:hover {
+                background: var(--vscode-button-hoverBackground);
+            }
+
+            .sidebar.collapsed {
+                display: none;
+            }
+
+            @media (max-width: 900px) {
+                body { padding: 6px; }
+                .main-container { gap: 8px; }
+                .sidebar { width: 260px; min-width: 240px; }
+
+                .filter-section {
+                    grid-template-columns: 1fr !important;
+                    gap: 10px !important;
+                    padding: 10px !important;
+                }
+
+                .filter-section > div {
+                    justify-content: flex-start !important;
+                }
+
+                .pagination-controls {
+                    flex-wrap: wrap;
+                    gap: 10px;
+                    padding: 10px;
+                }
+
+                .page-info {
+                    flex-wrap: wrap;
+                    gap: 8px !important;
+                }
+
+                .btn-nav {
+                    min-width: 70px;
+                }
+            }
+
+            @media (max-width: 700px) {
+                .main-container { position: relative; }
+                .sidebar {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    bottom: 0;
+                    z-index: 100;
+                    width: min(300px, 85vw);
+                    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+                }
+            }
         </style>
     </head>
     <body>
@@ -552,6 +624,9 @@ export function getPaginationHTML(metadata: any): string {
             </div>
 
             <div class="content-area">
+                <div class="topbar">
+                    <button class="sidebar-toggle" id="sidebar-toggle" title="Show or hide the variables panel" aria-label="Toggle variables sidebar">☰ Hide Variables</button>
+                </div>
                 <div class="filter-section" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: center;">
                     <!-- Left section: WHERE filter -->
                     <div style="display: flex; align-items: center; gap: 8px;">
@@ -569,9 +644,9 @@ export function getPaginationHTML(metadata: any): string {
                         <label for="unique-input" style="white-space: nowrap;">Unique:</label>
                         <input type="text" id="unique-input"
                                placeholder="VAR1 VAR2"
-                               title="Space-separated variables for unique values"
+                               title="Space-separated variables for unique values. Respects the active WHERE filter (toggle in the result modal)."
                                style="flex: 1; padding: 6px 12px; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); border-radius: 3px; font-size: 13px;">
-                        <button class="btn" id="unique-btn" style="padding: 6px 12px;">Show</button>
+                        <button class="btn" id="unique-btn" title="Get unique values — applies the active WHERE filter by default" style="padding: 6px 12px;">Show</button>
                     </div>
 
                     <!-- Right section: Dataset Metadata, Variables button and display mode -->
@@ -740,6 +815,13 @@ export function getPaginationHTML(metadata: any): string {
                 <div class="modal-body">
                     <div class="metadata-section">
                         <h3 id="unique-modal-title">Unique Values</h3>
+                        <div id="unique-modal-scope" style="margin-bottom: 8px; padding: 8px 10px; background: var(--vscode-editorWidget-background, var(--vscode-sideBar-background)); border-left: 3px solid var(--vscode-focusBorder); border-radius: 3px; font-size: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                            <span id="unique-scope-text">Scope: all rows</span>
+                            <label id="unique-filter-toggle-label" style="display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap;">
+                                <input type="checkbox" id="unique-apply-filter" checked>
+                                <span>Apply current WHERE filter</span>
+                            </label>
+                        </div>
                         <div id="unique-modal-summary" style="margin-bottom: 10px; color: var(--vscode-descriptionForeground); font-size: 12px;"></div>
                         <div style="overflow-x: auto; max-height: 400px; overflow-y: auto;">
                             <table class="metadata-table" id="unique-values-table" style="width: 100%; border-collapse: collapse;">
@@ -958,6 +1040,33 @@ export function getPaginationHTML(metadata: any): string {
                     }
                 });
 
+                // Sidebar collapse toggle with state persistence
+                const sidebarToggle = document.getElementById('sidebar-toggle');
+                const sidebarEl = document.querySelector('.sidebar');
+                const setSidebarCollapsed = (collapsed) => {
+                    if (!sidebarEl) return;
+                    sidebarEl.classList.toggle('collapsed', collapsed);
+                    if (sidebarToggle) {
+                        sidebarToggle.textContent = collapsed ? '☰ Show Variables' : '☰ Hide Variables';
+                    }
+                };
+
+                const savedState = vscode.getState() || {};
+                if (typeof savedState.sidebarCollapsed === 'boolean') {
+                    setSidebarCollapsed(savedState.sidebarCollapsed);
+                } else if (window.innerWidth < 700) {
+                    setSidebarCollapsed(true);
+                }
+
+                if (sidebarToggle) {
+                    sidebarToggle.addEventListener('click', () => {
+                        const next = !sidebarEl.classList.contains('collapsed');
+                        setSidebarCollapsed(next);
+                        const state = vscode.getState() || {};
+                        vscode.setState({ ...state, sidebarCollapsed: next });
+                    });
+                }
+
                 firstBtn.addEventListener('click', () => goToPage(1));
                 prevBtn.addEventListener('click', () => goToPage(currentPage - 1));
                 nextBtn.addEventListener('click', () => goToPage(currentPage + 1));
@@ -1067,6 +1176,19 @@ export function getPaginationHTML(metadata: any): string {
                     closeUniqueModal.addEventListener('click', () => {
                         if (uniqueValuesModal) {
                             uniqueValuesModal.style.display = 'none';
+                        }
+                    });
+                }
+
+                // Re-fire unique-values request when user toggles the WHERE-filter checkbox
+                const uniqueFilterCheckbox = document.getElementById('unique-apply-filter');
+                if (uniqueFilterCheckbox) {
+                    uniqueFilterCheckbox.addEventListener('change', () => {
+                        const useFilter = uniqueFilterCheckbox.checked;
+                        const state = vscode.getState() || {};
+                        vscode.setState({ ...state, uniqueUseFilter: useFilter });
+                        if (currentUniqueVariables && currentUniqueVariables.length > 0) {
+                            getUniqueValues(currentUniqueVariables, { useFilter: useFilter });
                         }
                     });
                 }
@@ -1462,7 +1584,10 @@ export function getPaginationHTML(metadata: any): string {
             }
 
             // Get unique values for specified variables
-            function getUniqueValues(variables) {
+            // Track the variables for the currently open Unique modal so the checkbox can re-fire
+            let currentUniqueVariables = [];
+
+            function getUniqueValues(variables, opts) {
                 // Validate that all variables exist
                 const invalidVars = variables.filter(v => !allVariables.some(av => av.name.toUpperCase() === v));
                 if (invalidVars.length > 0) {
@@ -1470,26 +1595,68 @@ export function getPaginationHTML(metadata: any): string {
                     return;
                 }
 
+                currentUniqueVariables = variables;
+
+                // Read user preference for filter scope (defaults to true = filter-aware)
+                const persistedState = vscode.getState() || {};
+                const useFilter = (opts && typeof opts.useFilter === 'boolean')
+                    ? opts.useFilter
+                    : (typeof persistedState.uniqueUseFilter === 'boolean' ? persistedState.uniqueUseFilter : true);
+
                 // Send request to extension
                 vscode.postMessage({
                     command: 'getUniqueValues',
-                    data: { variables: variables }
+                    data: {
+                        variables: variables,
+                        whereClause: currentWhereClause || '',
+                        useFilter: useFilter
+                    }
                 });
             }
 
             // Display unique values in modal
             function displayUniqueValues(data) {
-                const { variables, values, totalUnique } = data;
+                const { variables, values, totalUnique, appliedWhereClause, scopedRowCount, totalRows } = data;
 
                 // Update modal title
                 const modalTitle = document.getElementById('unique-modal-title');
                 const modalSummary = document.getElementById('unique-modal-summary');
+                const scopeText = document.getElementById('unique-scope-text');
+                const filterToggleLabel = document.getElementById('unique-filter-toggle-label');
+                const filterToggle = document.getElementById('unique-apply-filter');
                 const table = document.getElementById('unique-values-table');
 
                 if (modalTitle) {
                     modalTitle.textContent = variables.length === 1
                         ? 'Unique Values for ' + variables[0]
                         : 'Unique Combinations for ' + variables.join(', ');
+                }
+
+                // Scope bar — make it self-evident which rows were considered
+                const hasFilter = !!(currentWhereClause && currentWhereClause.trim());
+                const filterIsApplied = hasFilter && !!appliedWhereClause;
+                if (scopeText) {
+                    if (filterIsApplied) {
+                        const scopedStr = (typeof scopedRowCount === 'number') ? scopedRowCount.toLocaleString() : '?';
+                        const totalStr = (typeof totalRows === 'number') ? totalRows.toLocaleString() : '?';
+                        const safeWhere = String(currentWhereClause).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                        scopeText.innerHTML = 'Scope: <strong>filtered</strong> by WHERE <code style="background:var(--vscode-textCodeBlock-background);padding:1px 4px;border-radius:2px;">' + safeWhere + '</code> — ' + scopedStr + ' of ' + totalStr + ' rows';
+                    } else if (hasFilter) {
+                        const totalStr = (typeof totalRows === 'number') ? totalRows.toLocaleString() : '?';
+                        scopeText.innerHTML = 'Scope: <strong>all ' + totalStr + ' rows</strong> (current WHERE filter ignored)';
+                    } else {
+                        const totalStr = (typeof totalRows === 'number') ? totalRows.toLocaleString() : '?';
+                        scopeText.textContent = 'Scope: all ' + totalStr + ' rows (no filter active)';
+                    }
+                }
+
+                // Toggle visibility/enabled state — checkbox only matters when a filter is active
+                if (filterToggleLabel) {
+                    filterToggleLabel.style.display = hasFilter ? 'flex' : 'none';
+                }
+                if (filterToggle) {
+                    filterToggle.checked = filterIsApplied;
+                    filterToggle.disabled = !hasFilter;
                 }
 
                 if (modalSummary) {
