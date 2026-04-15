@@ -163,7 +163,14 @@ This extension contributes the following commands:
 
 ## 📝 Release Notes
 
-### 2.4.0 (Current)
+### 2.4.1 (Current)
+
+- **Fix**: Dataset Lens no longer tries to open every `.json` file
+  - The Dataset-JSON custom editor is now `priority: "option"`, so generic JSON files open in your default JSON editor (or other installed extensions)
+  - To view a CDISC Dataset-JSON file, right-click → **Open With...** → **Dataset Lens - Dataset-JSON**, or run the **Dataset Lens: Open CDISC Dataset-JSON File** command
+  - SAS7BDAT, XPT, RDS, and RData files continue to open automatically on double-click
+
+### 2.4.0
 
 - **Filter-aware Unique Values**: The Unique modal now respects the active WHERE filter by default
   - Results include scope info ("Scope: filtered N of M rows") at the top of the modal

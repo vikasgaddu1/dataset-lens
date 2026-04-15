@@ -2,6 +2,11 @@
 
 All notable changes to the "SAS Data Explorer" extension will be documented in this file.
 
+## [2.4.1] - 2026-04-15
+
+### Fixed
+- Dataset Lens no longer claims ownership of every `.json` file. The Dataset-JSON custom editor is now registered with `priority: "option"`, so generic JSON files open in the user's normal editor (or other installed JSON extensions). To view a CDISC Dataset-JSON file, right-click → **Open With...** → **Dataset Lens - Dataset-JSON**, or run the **Dataset Lens: Open CDISC Dataset-JSON File** command.
+
 ## [2.4.0] - 2026-04-15
 
 ### Added
