@@ -163,7 +163,14 @@ This extension contributes the following commands:
 
 ## 📝 Release Notes
 
-### 2.4.1 (Current)
+### 2.5.0 (Current)
+
+- **Fix**: Unique Values (Distinct) now works for SAS7BDAT files with mixed-case column names (e.g., `sashelp.cars` with `Make`, `Model`, `Type`). The SAS reader is now case-insensitive on column lookup, matching the Dataset-JSON and XPT readers.
+- **Fix**: Error toasts from the Unique Values request now show the real error message instead of `[object Object]`.
+- **New**: Right-side collapsible **Tools** panel groups WHERE filter, Unique Values input, Metadata buttons, and display mode. Toggle with `☰ Hide Tools` next to the Variables toggle. The old three-column filter bar at the top is gone.
+- **New**: **Export to CSV** button in the Tools panel. Exports the currently-visible view — checked variables on the left, filtered by the active WHERE clause — to a user-chosen file. Values with commas/quotes/newlines are RFC-4180 quoted.
+
+### 2.4.1
 
 - **Fix**: Dataset Lens no longer tries to open every `.json` file
   - The Dataset-JSON custom editor is now `priority: "option"`, so generic JSON files open in your default JSON editor (or other installed extensions)

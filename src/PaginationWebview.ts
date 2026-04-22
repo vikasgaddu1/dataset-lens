@@ -532,10 +532,75 @@ export function getPaginationHTML(metadata: any): string {
                 display: none;
             }
 
+            /* Right-side tools panel (Filter / Unique / Display / Export) */
+            .right-sidebar {
+                width: 300px;
+                min-width: 260px;
+                flex-shrink: 0;
+                background: var(--vscode-sideBar-background);
+                border: 1px solid var(--vscode-panel-border);
+                border-radius: 6px;
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+            }
+            .right-sidebar.collapsed { display: none; }
+
+            .right-sidebar .panel-section {
+                padding: 12px 15px;
+                border-bottom: 1px solid var(--vscode-panel-border);
+            }
+            .right-sidebar .panel-section:last-child { border-bottom: none; }
+
+            .right-sidebar .panel-section-title {
+                font-size: 11px;
+                font-weight: 600;
+                margin-bottom: 8px;
+                text-transform: uppercase;
+                color: var(--vscode-descriptionForeground);
+                letter-spacing: 0.5px;
+            }
+
+            .right-sidebar .panel-body {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .right-sidebar .panel-row {
+                display: flex;
+                gap: 6px;
+            }
+
+            .right-sidebar .panel-row .btn {
+                flex: 1;
+                min-width: 0;
+                padding: 5px 8px;
+                font-size: 12px;
+            }
+
+            .right-sidebar input[type="text"],
+            .right-sidebar select {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 5px 8px;
+                background: var(--vscode-input-background);
+                color: var(--vscode-input-foreground);
+                border: 1px solid var(--vscode-input-border);
+                border-radius: 3px;
+                font-size: 12px;
+            }
+
+            .right-sidebar label.field-label {
+                font-size: 11px;
+                color: var(--vscode-descriptionForeground);
+            }
+
             @media (max-width: 900px) {
                 body { padding: 6px; }
                 .main-container { gap: 8px; }
                 .sidebar { width: 260px; min-width: 240px; }
+                .right-sidebar { width: 240px; min-width: 220px; }
 
                 .filter-section {
                     grid-template-columns: 1fr !important;
@@ -568,6 +633,15 @@ export function getPaginationHTML(metadata: any): string {
                 .sidebar {
                     position: absolute;
                     left: 0;
+                    top: 0;
+                    bottom: 0;
+                    z-index: 100;
+                    width: min(300px, 85vw);
+                    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+                }
+                .right-sidebar {
+                    position: absolute;
+                    right: 0;
                     top: 0;
                     bottom: 0;
                     z-index: 100;
@@ -626,42 +700,7 @@ export function getPaginationHTML(metadata: any): string {
             <div class="content-area">
                 <div class="topbar">
                     <button class="sidebar-toggle" id="sidebar-toggle" title="Show or hide the variables panel" aria-label="Toggle variables sidebar">☰ Hide Variables</button>
-                </div>
-                <div class="filter-section" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: center;">
-                    <!-- Left section: WHERE filter -->
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <label for="where-input" style="white-space: nowrap;">WHERE:</label>
-                        <input type="text" id="where-input" class="where-input"
-                               placeholder="e.g., AGE > 30"
-                               title="Filter the dataset using SAS-style WHERE conditions"
-                               style="flex: 1;">
-                        <button class="btn" id="apply-filter-btn" style="padding: 6px 12px;">Apply</button>
-                        <button class="btn" id="clear-filter-btn" style="padding: 6px 12px;">Clear</button>
-                    </div>
-
-                    <!-- Middle section: Unique values -->
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <label for="unique-input" style="white-space: nowrap;">Unique:</label>
-                        <input type="text" id="unique-input"
-                               placeholder="VAR1 VAR2"
-                               title="Space-separated variables for unique values. Respects the active WHERE filter (toggle in the result modal)."
-                               style="flex: 1; padding: 6px 12px; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border); border-radius: 3px; font-size: 13px;">
-                        <button class="btn" id="unique-btn" title="Get unique values — applies the active WHERE filter by default" style="padding: 6px 12px;">Show</button>
-                    </div>
-
-                    <!-- Right section: Dataset Metadata, Variables button and display mode -->
-                    <div style="display: flex; align-items: center; gap: 12px; justify-content: flex-end;">
-                        <button class="btn" id="dataset-metadata-btn" style="padding: 6px 12px;" title="View dataset metadata">📄 Dataset Metadata</button>
-                        <button class="btn" id="metadata-btn" style="padding: 6px 12px;" title="View variable metadata">📊 Variables</button>
-                        <div class="display-mode" style="display: flex; align-items: center; gap: 6px;">
-                            <label style="font-size: 12px; white-space: nowrap;">Show:</label>
-                            <select id="display-mode" class="display-select" style="padding: 4px 8px; font-size: 12px;">
-                                <option value="name" selected>Names</option>
-                                <option value="label">Labels</option>
-                                <option value="both">Both</option>
-                            </select>
-                        </div>
-                    </div>
+                    <button class="sidebar-toggle" id="right-sidebar-toggle" title="Show or hide the tools panel" aria-label="Toggle tools panel" style="margin-left: auto;">☰ Hide Tools</button>
                 </div>
 
                 <div class="filter-info" id="filter-info" style="font-size: 12px; color: var(--vscode-descriptionForeground); padding: 0 15px; margin-bottom: 8px;">
@@ -700,6 +739,64 @@ export function getPaginationHTML(metadata: any): string {
                     </div>
                 </div>
             </div>
+
+            <!-- Right-side tools panel -->
+            <aside class="right-sidebar" id="right-sidebar">
+                <div class="panel-section">
+                    <div class="panel-section-title">Filter</div>
+                    <div class="panel-body">
+                        <label class="field-label" for="where-input">WHERE clause</label>
+                        <input type="text" id="where-input" class="where-input"
+                               placeholder="e.g., AGE > 30"
+                               title="Filter the dataset using SAS-style WHERE conditions">
+                        <div class="panel-row">
+                            <button class="btn" id="apply-filter-btn">Apply</button>
+                            <button class="btn" id="clear-filter-btn">Clear</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <div class="panel-section-title">Unique Values</div>
+                    <div class="panel-body">
+                        <label class="field-label" for="unique-input">Variables (space-separated)</label>
+                        <input type="text" id="unique-input"
+                               placeholder="VAR1 VAR2"
+                               title="Space-separated variables for unique values. Respects the active WHERE filter (toggle in the result modal).">
+                        <div class="panel-row">
+                            <button class="btn" id="unique-btn" title="Get unique values — applies the active WHERE filter by default">Show Unique</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <div class="panel-section-title">Metadata</div>
+                    <div class="panel-body">
+                        <button class="btn" id="dataset-metadata-btn" title="View dataset metadata">📄 Dataset Metadata</button>
+                        <button class="btn" id="metadata-btn" title="View variable metadata">📊 Variables</button>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <div class="panel-section-title">Display</div>
+                    <div class="panel-body">
+                        <label class="field-label" for="display-mode">Show variables as</label>
+                        <select id="display-mode" class="display-select">
+                            <option value="name" selected>Names</option>
+                            <option value="label">Labels</option>
+                            <option value="both">Both</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <div class="panel-section-title">Export</div>
+                    <div class="panel-body">
+                        <button class="btn" id="export-csv-btn" title="Export the visible data (selected columns + active WHERE filter) as a CSV file">📤 Export to CSV</button>
+                        <div id="export-status" style="font-size: 11px; color: var(--vscode-descriptionForeground); min-height: 14px;"></div>
+                    </div>
+                </div>
+            </aside>
         </div>
 
         <!-- Dataset Metadata Modal -->
@@ -1067,6 +1164,32 @@ export function getPaginationHTML(metadata: any): string {
                     });
                 }
 
+                // Right sidebar collapse toggle with state persistence
+                const rightSidebarToggle = document.getElementById('right-sidebar-toggle');
+                const rightSidebarEl = document.getElementById('right-sidebar');
+                const setRightSidebarCollapsed = (collapsed) => {
+                    if (!rightSidebarEl) return;
+                    rightSidebarEl.classList.toggle('collapsed', collapsed);
+                    if (rightSidebarToggle) {
+                        rightSidebarToggle.textContent = collapsed ? '☰ Show Tools' : '☰ Hide Tools';
+                    }
+                };
+
+                if (typeof savedState.rightSidebarCollapsed === 'boolean') {
+                    setRightSidebarCollapsed(savedState.rightSidebarCollapsed);
+                } else if (window.innerWidth < 900) {
+                    setRightSidebarCollapsed(true);
+                }
+
+                if (rightSidebarToggle) {
+                    rightSidebarToggle.addEventListener('click', () => {
+                        const next = !rightSidebarEl.classList.contains('collapsed');
+                        setRightSidebarCollapsed(next);
+                        const state = vscode.getState() || {};
+                        vscode.setState({ ...state, rightSidebarCollapsed: next });
+                    });
+                }
+
                 firstBtn.addEventListener('click', () => goToPage(1));
                 prevBtn.addEventListener('click', () => goToPage(currentPage - 1));
                 nextBtn.addEventListener('click', () => goToPage(currentPage + 1));
@@ -1190,6 +1313,27 @@ export function getPaginationHTML(metadata: any): string {
                         if (currentUniqueVariables && currentUniqueVariables.length > 0) {
                             getUniqueValues(currentUniqueVariables, { useFilter: useFilter });
                         }
+                    });
+                }
+
+                // Export to CSV
+                const exportCsvBtn = document.getElementById('export-csv-btn');
+                const exportStatus = document.getElementById('export-status');
+                if (exportCsvBtn) {
+                    exportCsvBtn.addEventListener('click', () => {
+                        if (!selectedColumns || selectedColumns.length === 0) {
+                            showToast('Select at least one variable to export.', 'warning');
+                            return;
+                        }
+                        exportCsvBtn.disabled = true;
+                        if (exportStatus) exportStatus.textContent = 'Preparing CSV…';
+                        vscode.postMessage({
+                            command: 'exportCsv',
+                            data: {
+                                selectedColumns: selectedColumns,
+                                whereClause: currentWhereClause || ''
+                            }
+                        });
                     });
                 }
 
@@ -1479,8 +1623,35 @@ export function getPaginationHTML(metadata: any): string {
                         console.log('Received unique values result');
                         displayUniqueValues(message.data);
                         break;
+
+                    case 'exportCsvDone':
+                        handleExportCsvDone(message);
+                        break;
+
+                    case 'exportCsvError':
+                        handleExportCsvError(message);
+                        break;
                 }
             });
+
+            function handleExportCsvDone(message) {
+                const btn = document.getElementById('export-csv-btn');
+                const status = document.getElementById('export-status');
+                if (btn) btn.disabled = false;
+                if (status) status.textContent = 'Saved ' + message.rowCount + ' rows';
+                showToast('Exported ' + message.rowCount + ' rows to ' + message.path, 'info');
+            }
+
+            function handleExportCsvError(message) {
+                const btn = document.getElementById('export-csv-btn');
+                const status = document.getElementById('export-status');
+                if (btn) btn.disabled = false;
+                if (status) status.textContent = '';
+                if (message.message === 'Cancelled') {
+                    return;
+                }
+                showToast('Export failed: ' + message.message, 'error');
+            }
 
             // Variable selection functions
             function handleVariableSelection() {
@@ -1677,11 +1848,11 @@ export function getPaginationHTML(metadata: any): string {
                     values.forEach(row => {
                         bodyHtml += '<tr>';
                         if (variables.length === 1) {
-                            bodyHtml += '<td style="padding: 8px; border-bottom: 1px solid var(--vscode-panel-border);">' + (row.value !== null ? row.value : '(null)') + '</td>';
+                            bodyHtml += '<td style="padding: 8px; border-bottom: 1px solid var(--vscode-panel-border);">' + (row.value != null ? row.value : '(null)') + '</td>';
                         } else {
                             variables.forEach(v => {
                                 const val = row.combination[v];
-                                bodyHtml += '<td style="padding: 8px; border-bottom: 1px solid var(--vscode-panel-border);">' + (val !== null ? val : '(null)') + '</td>';
+                                bodyHtml += '<td style="padding: 8px; border-bottom: 1px solid var(--vscode-panel-border);">' + (val != null ? val : '(null)') + '</td>';
                             });
                         }
                         bodyHtml += '<td style="padding: 8px; border-bottom: 1px solid var(--vscode-panel-border);">' + row.count + '</td>';

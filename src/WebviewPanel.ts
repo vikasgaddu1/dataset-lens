@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
 import { SASDatasetDocument } from './SasDataProvider';
 import { WebviewMessage, FilterState, SASDataRequest, IDatasetDocument } from './types';
 import { getPaginationHTML } from './PaginationWebview';
@@ -162,6 +163,10 @@ export class SASWebviewPanel {
 
             case 'getUniqueValues':
                 await this.handleGetUniqueValues(message.data);
+                break;
+
+            case 'exportCsv':
+                await this.handleExportCsv(message.data);
                 break;
 
             default:
@@ -396,10 +401,84 @@ export class SASWebviewPanel {
             });
 
         } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
             this.logger.error('Error getting unique values', error);
             await this.panel.webview.postMessage({
                 type: 'error',
-                message: `Failed to get unique values: ${error}`
+                message: `Failed to get unique values: ${message}`
+            });
+        }
+    }
+
+    /**
+     * Handle CSV export request — writes currently-visible (selected columns
+     * + active WHERE filter) data to a user-chosen file.
+     */
+    private async handleExportCsv(data: { selectedColumns?: string[]; whereClause?: string }): Promise<void> {
+        try {
+            if (!this.document.metadata) {
+                throw new Error('Dataset metadata not available');
+            }
+
+            const allVarNames = this.document.metadata.variables.map(v => v.name);
+            const cols = (data.selectedColumns && data.selectedColumns.length > 0)
+                ? data.selectedColumns
+                : allVarNames;
+
+            const sourceName = (this.document.uri.fsPath.split(/[\\/]/).pop() || 'export')
+                .replace(/\.[^.]+$/, '');
+            const defaultName = sourceName + '.csv';
+            const target = await vscode.window.showSaveDialog({
+                defaultUri: vscode.Uri.file(defaultName),
+                filters: { 'CSV': ['csv'] },
+                saveLabel: 'Export CSV'
+            });
+
+            if (!target) {
+                await this.panel.webview.postMessage({
+                    type: 'exportCsvError',
+                    message: 'Cancelled'
+                });
+                return;
+            }
+
+            const totalRows = this.document.metadata.total_rows || 0;
+
+            const response = await this.document.getData({
+                filePath: this.document.uri.fsPath,
+                startRow: 0,
+                numRows: totalRows,
+                selectedVars: cols,
+                whereClause: data.whereClause || ''
+            });
+
+            const rows: Array<Record<string, any>> = response.data || [];
+
+            const escape = (v: any): string => {
+                if (v === null || v === undefined) return '';
+                const s = typeof v === 'string' ? v : String(v);
+                return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+            };
+
+            const headerLine = cols.map(escape).join(',');
+            const bodyLines = rows.map(r => cols.map(c => escape(r[c])).join(','));
+            const csv = [headerLine, ...bodyLines].join('\r\n');
+
+            await fs.promises.writeFile(target.fsPath, csv, 'utf8');
+
+            this.logger.info(`Exported ${rows.length} rows to ${target.fsPath}`);
+
+            await this.panel.webview.postMessage({
+                type: 'exportCsvDone',
+                path: target.fsPath,
+                rowCount: rows.length
+            });
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            this.logger.error('CSV export failed', err);
+            await this.panel.webview.postMessage({
+                type: 'exportCsvError',
+                message: msg
             });
         }
     }

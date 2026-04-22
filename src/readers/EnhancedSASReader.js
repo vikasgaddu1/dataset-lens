@@ -209,7 +209,7 @@ var EnhancedSASReader = /** @class */ (function () {
                         _a.metadata = _b.sent();
                         _b.label = 2;
                     case 2:
-                        colIndex = this.metadata.columns.findIndex(function (col) { return col.name === columnName; });
+                        colIndex = this.metadata.columns.findIndex(function (col) { return col.name.toUpperCase() === columnName.toUpperCase(); });
                         if (colIndex === -1) {
                             throw new Error("Column '".concat(columnName, "' not found"));
                         }
@@ -260,7 +260,7 @@ var EnhancedSASReader = /** @class */ (function () {
                         _c.label = 2;
                     case 2:
                         indices = columnNames.map(function (name) {
-                            var idx = _this.metadata.columns.findIndex(function (col) { return col.name === name; });
+                            var idx = _this.metadata.columns.findIndex(function (col) { return col.name.toUpperCase() === name.toUpperCase(); });
                             if (idx === -1) {
                                 throw new Error("Column '".concat(name, "' not found"));
                             }
@@ -389,7 +389,7 @@ var EnhancedSASReader = /** @class */ (function () {
                     case 0: return [4 /*yield*/, this.getMetadata()];
                     case 1:
                         metadata = _a.sent();
-                        variable = metadata.variables.find(function (v) { return v.name === columnName; });
+                        variable = metadata.variables.find(function (v) { return v.name.toUpperCase() === columnName.toUpperCase(); });
                         if (!variable) {
                             throw new Error("Column '".concat(columnName, "' not found"));
                         }

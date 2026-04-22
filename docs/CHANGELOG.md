@@ -2,6 +2,17 @@
 
 All notable changes to the "SAS Data Explorer" extension will be documented in this file.
 
+## [2.5.0] - 2026-04-22
+
+### Fixed
+- **Distinct / Unique Values** now works for SAS7BDAT datasets whose column names are not all-uppercase (e.g., the classic `sashelp.cars` with `Make`, `Model`, `Type`). The SAS reader now matches columns case-insensitively, matching the Dataset-JSON and XPT readers.
+- When a unique-values request does fail, the error toast now contains the real error message instead of `[object Object]`.
+- Unique Values table renders `(null)` for both `null` and `undefined` cells instead of the literal string `"undefined"`.
+
+### Added
+- **Right-side collapsible Tools panel** — WHERE filter, Unique Values input, Metadata buttons, and display mode are now grouped in a dedicated right-hand sidebar with its own `☰ Hide Tools` toggle. The previous three-column filter bar at the top is gone; the row-count status line remains above the table.
+- **Export to CSV** button in the new Tools panel. Exports the currently-visible view: the variables that are checked in the left sidebar, filtered by the active WHERE clause. Uses a native save dialog and RFC-4180 quoting.
+
 ## [2.4.1] - 2026-04-15
 
 ### Fixed

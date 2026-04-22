@@ -206,9 +206,10 @@ export class EnhancedSASReader {
             this.metadata = await this.dataset.getMetadata();
         }
 
-        // Find column index
+        // Find column index (case-insensitive so mixed-case column names like
+        // sashelp.cars "Make" resolve when the webview sends uppercased input)
         const colIndex = this.metadata.columns.findIndex(
-            (col: any) => col.name === columnName
+            (col: any) => col.name.toUpperCase() === columnName.toUpperCase()
         );
 
         if (colIndex === -1) {
@@ -256,10 +257,10 @@ export class EnhancedSASReader {
             this.metadata = await this.dataset.getMetadata();
         }
 
-        // Find column indices
+        // Find column indices (case-insensitive, see getUniqueValues note)
         const indices = columnNames.map(name => {
             const idx = this.metadata.columns.findIndex(
-                (col: any) => col.name === name
+                (col: any) => col.name.toUpperCase() === name.toUpperCase()
             );
             if (idx === -1) {
                 throw new Error(`Column '${name}' not found`);
@@ -831,7 +832,7 @@ export class EnhancedSASReader {
         isCategorical: boolean;
     }> {
         const metadata = await this.getMetadata();
-        const variable = metadata.variables.find(v => v.name === columnName);
+        const variable = metadata.variables.find(v => v.name.toUpperCase() === columnName.toUpperCase());
 
         if (!variable) {
             throw new Error(`Column '${columnName}' not found`);
